@@ -5,104 +5,504 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Controle de Estoque TI</title>
   <style>
-    * { box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+    * { 
+      box-sizing: border-box; 
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+      margin: 0; 
+      padding: 0;
+    }
+    
     body {
-      margin: 0; padding: 0; background: #0d1117; color: #e6edf3;
-      display: flex; flex-direction: column; align-items: center;
+      background: linear-gradient(135deg, #0d1117 0%, #161b22 100%);
+      color: #e6edf3;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
     }
-    h1 { margin: 20px 0; color: #58a6ff; }
-    form {
-      display: grid; gap: 10px; width: 90%; max-width: 700px;
-      background: #161b22; padding: 20px; border-radius: 10px;
-      box-shadow: 0 0 10px #00000050;
+    
+    .container {
+      width: 100%;
+      max-width: 1200px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
     }
-    input, textarea, select, button {
-      padding: 10px; border: none; border-radius: 5px;
+    
+    h1 {
+      margin: 20px 0;
+      color: #58a6ff;
+      text-align: center;
+      font-size: 2.2rem;
+    }
+    
+    .subtitle {
+      color: #8b949e;
+      margin-bottom: 30px;
+      text-align: center;
+    }
+    
+    /* Tela de Login */
+    #loginScreen {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      max-width: 400px;
+      background: #161b22;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+    }
+    
+    #loginScreen h2 {
+      margin-bottom: 20px;
+      color: #58a6ff;
+    }
+    
+    .login-form {
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+      gap: 15px;
+    }
+    
+    .login-form input {
+      padding: 12px;
+      border: none;
+      border-radius: 5px;
+      background: #0d1117;
+      color: #e6edf3;
+      border: 1px solid #30363d;
       font-size: 1em;
     }
-    input, textarea, select { width: 100%; background: #0d1117; color: #e6edf3; border: 1px solid #30363d; }
+    
+    .login-form button {
+      padding: 12px;
+      border: none;
+      border-radius: 5px;
+      background: #238636;
+      color: white;
+      cursor: pointer;
+      transition: 0.2s;
+      font-weight: bold;
+      font-size: 1em;
+    }
+    
+    .login-form button:hover {
+      background: #2ea043;
+    }
+    
+    /* Menu Inicial */
+    #mainMenu {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      width: 100%;
+    }
+    
+    .menu-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
+      width: 100%;
+      max-width: 800px;
+      margin: 30px 0;
+    }
+    
+    .menu-card {
+      background: #161b22;
+      padding: 25px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+      text-align: center;
+      cursor: pointer;
+      transition: transform 0.3s, box-shadow 0.3s;
+    }
+    
+    .menu-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.4);
+    }
+    
+    .menu-card h3 {
+      color: #58a6ff;
+      margin-bottom: 10px;
+    }
+    
+    .menu-card p {
+      color: #8b949e;
+    }
+    
+    /* Tela de Controle de Estoque */
+    #inventoryScreen {
+      display: none;
+      width: 100%;
+      flex-direction: column;
+      align-items: center;
+    }
+    
+    .form-container {
+      width: 100%;
+      max-width: 700px;
+      background: #161b22;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+      margin-bottom: 20px;
+    }
+    
+    form {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 15px;
+    }
+    
+    .form-group {
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .form-group.full-width {
+      grid-column: 1 / -1;
+    }
+    
+    label {
+      margin-bottom: 5px;
+      color: #8b949e;
+      font-size: 0.9rem;
+    }
+    
+    input, textarea, select, button {
+      padding: 10px;
+      border: none;
+      border-radius: 5px;
+      font-size: 1em;
+    }
+    
+    input, textarea, select { 
+      width: 100%; 
+      background: #0d1117; 
+      color: #e6edf3; 
+      border: 1px solid #30363d; 
+    }
+    
     button {
-      background: #238636; color: white; cursor: pointer;
-      transition: 0.2s; font-weight: bold;
+      background: #238636; 
+      color: white; 
+      cursor: pointer;
+      transition: 0.2s; 
+      font-weight: bold;
     }
-    button:hover { background: #2ea043; }
-    table {
-      width: 95%; max-width: 900px; margin-top: 25px;
-      border-collapse: collapse; background: #161b22;
+    
+    button:hover { 
+      background: #2ea043; 
     }
-    th, td {
-      padding: 10px; text-align: left; border-bottom: 1px solid #30363d;
+    
+    button.secondary {
+      background: #21262d;
     }
-    th { color: #58a6ff; font-weight: bold; }
-    .actions button { margin-right: 5px; }
+    
+    button.secondary:hover {
+      background: #30363d;
+    }
+    
     .export-area {
-      margin: 25px; display: flex; flex-wrap: wrap; gap: 10px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
       justify-content: center;
+      margin: 20px 0;
+      width: 100%;
+      max-width: 700px;
+    }
+    
+    .export-area button {
+      flex: 1;
+      min-width: 150px;
+    }
+    
+    table {
+      width: 100%;
+      max-width: 1000px;
+      margin-top: 25px;
+      border-collapse: collapse;
+      background: #161b22;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+    }
+    
+    th, td {
+      padding: 12px 15px;
+      text-align: left;
+      border-bottom: 1px solid #30363d;
+    }
+    
+    th { 
+      background: #1f2937;
+      color: #58a6ff; 
+      font-weight: bold;
+      position: sticky;
+      top: 0;
+    }
+    
+    tr:hover {
+      background: #1a2129;
+    }
+    
+    .actions {
+      display: flex;
+      gap: 5px;
+    }
+    
+    .actions button {
+      padding: 5px 10px;
+      font-size: 0.9rem;
+    }
+    
+    /* Responsividade */
+    @media (max-width: 768px) {
+      form {
+        grid-template-columns: 1fr;
+      }
+      
+      .menu-cards {
+        grid-template-columns: 1fr;
+      }
+      
+      table {
+        font-size: 0.9rem;
+      }
+      
+      th, td {
+        padding: 8px 10px;
+      }
     }
   </style>
 </head>
 <body>
-  <h1>📦 Controle de Estoque — Setor de TI</h1>
-
-  <form id="itemForm">
-    <select id="category" required>
-      <option value="">Selecione a categoria</option>
-      <option value="Periférico">Periférico</option>
-      <option value="Rede">Rede</option>
-      <option value="Placa-mãe">Placa-mãe</option>
-      <option value="Armazenamento">Armazenamento</option>
-      <option value="Outros">Outros</option>
-    </select>
-    <input type="text" id="name" placeholder="Nome do item" required />
-    <input type="text" id="serial" placeholder="Número de série (opcional)" />
-    <input type="text" id="brand" placeholder="Marca" />
-    <input type="text" id="model" placeholder="Modelo" />
-    <input type="number" id="qty" placeholder="Quantidade" min="1" required />
-    <input type="text" id="location" placeholder="Localização no estoque" />
-    <input type="text" id="supplier" placeholder="Fornecedor" />
-    <textarea id="notes" placeholder="Observações (opcional)"></textarea>
-    <button type="submit">Adicionar ao Estoque</button>
-  </form>
-
-  <div class="export-area">
-    <button onclick="exportExcel()">Exportar Excel Profissional</button>
-    <button onclick="exportBackup()">Backup (.json)</button>
-    <input type="file" id="importBackup" style="display:none" accept=".json" onchange="importBackup(event)" />
-    <button onclick="document.getElementById('importBackup').click()">Importar Backup</button>
+  <div class="container">
+    <!-- Tela de Login -->
+    <div id="loginScreen">
+      <h1>📦 Controle de Estoque</h1>
+      <p class="subtitle">Setor de TI</p>
+      <h2>Login</h2>
+      <form class="login-form" id="loginForm">
+        <input type="text" id="username" placeholder="Usuário" required />
+        <input type="password" id="password" placeholder="Senha" required />
+        <button type="submit">Entrar</button>
+      </form>
+    </div>
+    
+    <!-- Menu Principal -->
+    <div id="mainMenu">
+      <h1>📦 Controle de Estoque</h1>
+      <p class="subtitle">Setor de TI</p>
+      
+      <div class="menu-cards">
+        <div class="menu-card" onclick="showInventoryScreen()">
+          <h3>📋 Gerenciar Estoque</h3>
+          <p>Adicionar, editar ou remover itens do estoque</p>
+        </div>
+        <div class="menu-card" onclick="exportExcel()">
+          <h3>📊 Exportar Relatório</h3>
+          <p>Gerar relatório em Excel do estoque atual</p>
+        </div>
+        <div class="menu-card" onclick="showBackupScreen()">
+          <h3>💾 Backup</h3>
+          <p>Fazer backup ou restaurar dados do sistema</p>
+        </div>
+        <div class="menu-card" onclick="logout()">
+          <h3>🚪 Sair</h3>
+          <p>Encerrar sessão no sistema</p>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Tela de Controle de Estoque -->
+    <div id="inventoryScreen">
+      <h1>📦 Controle de Estoque</h1>
+      <p class="subtitle">Setor de TI</p>
+      
+      <div class="form-container">
+        <form id="itemForm">
+          <div class="form-group">
+            <label for="category">Categoria</label>
+            <select id="category" required>
+              <option value="">Selecione a categoria</option>
+              <option value="Periférico">Periférico</option>
+              <option value="Rede">Rede</option>
+              <option value="Placa-mãe">Placa-mãe</option>
+              <option value="Armazenamento">Armazenamento</option>
+              <option value="Outros">Outros</option>
+            </select>
+          </div>
+          
+          <div class="form-group">
+            <label for="name">Nome do Item</label>
+            <input type="text" id="name" placeholder="Nome do item" required />
+          </div>
+          
+          <div class="form-group">
+            <label for="brand">Marca</label>
+            <input type="text" id="brand" placeholder="Marca" required />
+          </div>
+          
+          <div class="form-group">
+            <label for="employee">Quem está solicitando?</label>
+            <input type="text" id="employee" placeholder="Colaborador" required />
+          </div>
+          
+          <div class="form-group">
+            <label for="model">Modelo</label>
+            <input type="text" id="model" placeholder="Modelo" required />
+          </div>
+          
+          <div class="form-group">
+            <label for="qty">Quantidade</label>
+            <input type="number" id="qty" placeholder="Quantidade" min="1" required />
+          </div>
+          
+          <div class="form-group">
+            <label for="location">Localização</label>
+            <input type="text" id="location" placeholder="Localização no estoque" />
+          </div>
+          
+          <div class="form-group">
+            <label for="supplier">Fornecedor</label>
+            <input type="text" id="supplier" placeholder="Fornecedor (opcional)" />
+          </div>
+          
+          <div class="form-group">
+            <label for="serial">Número de Série</label>
+            <input type="text" id="serial" placeholder="Número de série (opcional)" />
+          </div>
+          
+          <div class="form-group full-width">
+            <label for="notes">Observações</label>
+            <textarea id="notes" placeholder="Observações (opcional)" rows="3"></textarea>
+          </div>
+          
+          <div class="form-group full-width">
+            <button type="submit">Adicionar ao Estoque</button>
+          </div>
+        </form>
+      </div>
+      
+      <div class="export-area">
+        <button onclick="exportExcel()">Exportar Excel</button>
+        <button onclick="exportBackup()">Backup (.json)</button>
+        <input type="file" id="importBackup" style="display:none" accept=".json" onchange="importBackup(event)" />
+        <button onclick="document.getElementById('importBackup').click()">Importar Backup</button>
+        <button class="secondary" onclick="showMainMenu()">Voltar ao Menu</button>
+      </div>
+      
+      <table id="inventoryTable">
+        <thead>
+          <tr>
+            <th>Categoria</th>
+            <th>Nome</th>
+            <th>Marca</th>
+            <th>Modelo</th>
+            <th>Qtd</th>
+            <th>Local</th>
+            <th>Fornecedor</th>
+            <th>Funcionário</th>
+            <th>Data</th>
+            <th>Ações</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
   </div>
-
-  <table id="inventoryTable">
-    <thead>
-      <tr>
-        <th>Categoria</th>
-        <th>Nome</th>
-        <th>Marca</th>
-        <th>Modelo</th>
-        <th>Qtd</th>
-        <th>Local</th>
-        <th>Fornecedor</th>
-        <th>Data</th>
-        <th>Ações</th>
-      </tr>
-    </thead>
-    <tbody></tbody>
-  </table>
 
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <script>
+    // Elementos da interface
+    const loginScreen = document.getElementById('loginScreen');
+    const mainMenu = document.getElementById('mainMenu');
+    const inventoryScreen = document.getElementById('inventoryScreen');
     const form = document.getElementById('itemForm');
     const tableBody = document.querySelector('#inventoryTable tbody');
+    
+    // Dados do estoque
     let inventory = JSON.parse(localStorage.getItem('inventoryData')) || [];
-
+    let currentUser = localStorage.getItem('currentUser') || '';
+    
+    // Inicialização
+    function init() {
+      // Verificar se já existe um usuário logado
+      if (currentUser) {
+        showMainMenu();
+      } else {
+        showLoginScreen();
+      }
+      
+      // Renderizar tabela se houver dados
+      renderTable();
+    }
+    
+    // Funções de navegação
+    function showLoginScreen() {
+      loginScreen.style.display = 'flex';
+      mainMenu.style.display = 'none';
+      inventoryScreen.style.display = 'none';
+    }
+    
+    function showMainMenu() {
+      loginScreen.style.display = 'none';
+      mainMenu.style.display = 'flex';
+      inventoryScreen.style.display = 'none';
+    }
+    
+    function showInventoryScreen() {
+      loginScreen.style.display = 'none';
+      mainMenu.style.display = 'none';
+      inventoryScreen.style.display = 'flex';
+    }
+    
+    function showBackupScreen() {
+      // Para simplificar, vamos apenas mostrar os botões de backup na tela de estoque
+      showInventoryScreen();
+    }
+    
+    function logout() {
+      currentUser = '';
+      localStorage.removeItem('currentUser');
+      showLoginScreen();
+    }
+    
+    // Sistema de login simples (em um sistema real, isso seria mais seguro)
+    document.getElementById('loginForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const username = document.getElementById('username').value.trim();
+      const password = document.getElementById('password').value.trim();
+      
+      // Login com credenciais específicas
+      if (username === 'admin' && password === 'sbs12345') {
+        currentUser = username;
+        localStorage.setItem('currentUser', currentUser);
+        showMainMenu();
+      } else {
+        alert('Usuário ou senha incorretos.');
+      }
+    });
+    
+    // Funções do estoque
     function saveLocal() {
       localStorage.setItem('inventoryData', JSON.stringify(inventory));
     }
-
+    
     function safe(id) {
       const el = document.getElementById(id);
       return el ? (el.value || '').trim() : '';
     }
-
+    
     function getFormData() {
       return {
         id: Date.now().toString(36),
@@ -110,6 +510,7 @@
         name: safe('name'),
         serial: safe('serial'),
         brand: safe('brand'),
+        employee: safe('employee'), // Campo do funcionário adicionado
         model: safe('model'),
         qty: parseInt(safe('qty') || 0, 10),
         location: safe('location'),
@@ -118,7 +519,7 @@
         createdAt: new Date().toLocaleString()
       };
     }
-
+    
     function renderTable() {
       tableBody.innerHTML = '';
       inventory.forEach((item, i) => {
@@ -131,6 +532,7 @@
           <td>${item.qty}</td>
           <td>${item.location}</td>
           <td>${item.supplier}</td>
+          <td>${item.employee}</td> <!-- Campo do funcionário adicionado -->
           <td>${item.createdAt}</td>
           <td class="actions">
             <button onclick="editItem(${i})">✏️</button>
@@ -140,17 +542,18 @@
         tableBody.appendChild(row);
       });
     }
-
+    
     function addItem(e) {
       e.preventDefault();
       const data = getFormData();
       if (!data.name) return alert('Preencha o nome do item.');
+      if (!data.employee) return alert('Preencha o nome do funcionário.');
       inventory.push(data);
       saveLocal();
       renderTable();
       form.reset();
     }
-
+    
     function deleteItem(i) {
       if (confirm('Excluir este item?')) {
         inventory.splice(i, 1);
@@ -158,7 +561,7 @@
         renderTable();
       }
     }
-
+    
     function editItem(i) {
       const item = inventory[i];
       Object.keys(item).forEach(k => {
@@ -168,10 +571,10 @@
       deleteItem(i);
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
-
+    
     function exportExcel() {
       if (!inventory.length) return alert('Nenhum item para exportar.');
-
+      
       const ws_data = inventory.map(item => ({
         Categoria: item.category,
         Nome: item.name,
@@ -180,20 +583,33 @@
         Quantidade: item.qty,
         Local: item.location,
         Fornecedor: item.supplier,
+        Funcionário: item.employee, // Campo do funcionário adicionado
         Data: item.createdAt
       }));
-
+      
       // Adiciona linha de total
       const totalQty = inventory.reduce((sum, i) => sum + i.qty, 0);
-      ws_data.push({ Categoria:'', Nome:'', Marca:'', Modelo:'Total', Quantidade:totalQty, Local:'', Fornecedor:'', Data:'' });
-
-      const ws = XLSX.utils.json_to_sheet(ws_data, { header:["Categoria","Nome","Marca","Modelo","Quantidade","Local","Fornecedor","Data"] });
-      ws['!autofilter'] = { ref: "A1:H"+(ws_data.length+1) }; // filtros automáticos
+      ws_data.push({ 
+        Categoria:'', 
+        Nome:'', 
+        Marca:'', 
+        Modelo:'Total', 
+        Quantidade:totalQty, 
+        Local:'', 
+        Fornecedor:'', 
+        Funcionário:'',
+        Data:'' 
+      });
+      
+      const ws = XLSX.utils.json_to_sheet(ws_data, { 
+        header:["Categoria","Nome","Marca","Modelo","Quantidade","Local","Fornecedor","Funcionário","Data"] 
+      });
+      ws['!autofilter'] = { ref: "A1:I"+(ws_data.length+1) }; // filtros automáticos
       const wb = XLSX.utils.book_new();
       XLSX.utils.book_append_sheet(wb, ws, 'Estoque');
       XLSX.writeFile(wb, 'estoque_profissional.xlsx');
     }
-
+    
     function exportBackup() {
       const blob = new Blob([JSON.stringify(inventory, null, 2)], { type: 'application/json' });
       const link = document.createElement('a');
@@ -201,7 +617,7 @@
       link.download = 'backup_estoque.json';
       link.click();
     }
-
+    
     function importBackup(e) {
       const file = e.target.files[0];
       if (!file) return;
@@ -221,10 +637,12 @@
       };
       reader.readAsText(file);
     }
-
+    
+    // Event Listeners
     form.addEventListener('submit', addItem);
-    renderTable();
-    window.addEventListener('beforeunload', saveLocal);
+    
+    // Inicializar a aplicação
+    init();
   </script>
 </body>
 </html>
