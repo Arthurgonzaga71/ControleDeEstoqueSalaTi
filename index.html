@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Controle de Estoque TI</title>
+  <style>
+    * { box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+    body {
+      margin: 0; padding: 0; background: #0d1117; color: #e6edf3;
+      display: flex; flex-direction: column; align-items: center;
+    }
+    h1 { margin: 20px 0; color: #58a6ff; }
+    form {
+      display: grid; gap: 10px; width: 90%; max-width: 700px;
+      background: #161b22; padding: 20px; border-radius: 10px;
+      box-shadow: 0 0 10px #00000050;
+    }
+    input, textarea, select, button {
+      padding: 10px; border: none; border-radius: 5px;
+      font-size: 1em;
+    }
+    input, textarea, select { width: 100%; background: #0d1117; color: #e6edf3; border: 1px solid #30363d; }
+    button {
+      background: #238636; color: white; cursor: pointer;
+      transition: 0.2s; font-weight: bold;
+    }
+    button:hover { background: #2ea043; }
+    table {
+      width: 95%; max-width: 900px; margin-top: 25px;
+      border-collapse: collapse; background: #161b22;
+    }
+    th, td {
+      padding: 10px; text-align: left; border-bottom: 1px solid #30363d;
+    }
+    th { color: #58a6ff; font-weight: bold; }
+    .actions button { margin-right: 5px; }
+    .export-area {
+      margin: 25px; display: flex; flex-wrap: wrap; gap: 10px;
+      justify-content: center;
+    }
+  </style>
+</head>
+<body>
+  <h1>📦 Controle de Estoque — Setor de TI</h1>
+
+  <form id="itemForm">
+    <select id="category" required>
+      <option value="">Selecione a categoria</option>
+      <option value="Periférico">Periférico</option>
+      <option value="Rede">Rede</option>
+      <option value="Placa-mãe">Placa-mãe</option>
+      <option value="Armazenamento">Armazenamento</option>
+      <option value="Outros">Outros</option>
+    </select>
+    <input type="text" id="name" placeholder="Nome do item" required />
+    <input type="text" id="serial" placeholder="Número de série (opcional)" />
+    <input type="text" id="brand" placeholder="Marca" />
+    <input type="text" id="model" placeholder="Modelo" />
+    <input type="number" id="qty" placeholder="Quantidade" min="1" required />
+    <input type="text" id="location" placeholder="Localização no estoque" />
+    <input type="text" id="supplier" placeholder="Fornecedor" />
+    <textarea id="notes" placeholder="Observações (opcional)"></textarea>
+    <button type="submit">Adicionar ao Estoque</button>
+  </form>
+
+  <div class="export-area">
+    <button onclick="exportExcel()">Exportar Excel Profissional</button>
+    <button onclick="exportBackup()">Backup (.json)</button>
+    <input type="file" id="importBackup" style="display:none" accept=".json" onchange="importBackup(event)" />
+    <button onclick="document.getElementById('importBackup').click()">Importar Backup</button>
+  </div>
+
+  <table id="inventoryTable">
+    <thead>
+      <tr>
+        <th>Categoria</th>
+        <th>Nome</th>
+        <th>Marca</th>
+        <th>Modelo</th>
+        <th>Qtd</th>
+        <th>Local</th>
+        <th>Fornecedor</th>
+        <th>Data</th>
+        <th>Ações</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <script>
+    const form = document.getElementById('itemForm');
+    const tableBody = document.querySelector('#inventoryTable tbody');
+    let inventory = JSON.parse(localStorage.getItem('inventoryData')) || [];
+
+    function saveLocal() {
+      localStorage.setItem('inventoryData', JSON.stringify(inventory));
+    }
+
+    function safe(id) {
+      const el = document.getElementById(id);
+      return el ? (el.value || '').trim() : '';
+    }
+
+    function getFormData() {
+      return {
+        id: Date.now().toString(36),
+        category: safe('category'),
+        name: safe('name'),
+        serial: safe('serial'),
+        brand: safe('brand'),
+        model: safe('model'),
+        qty: parseInt(safe('qty') || 0, 10),
+        location: safe('location'),
+        supplier: safe('supplier'),
+        notes: safe('notes'),
+        createdAt: new Date().toLocaleString()
+      };
+    }
+
+    function renderTable() {
+      tableBody.innerHTML = '';
+      inventory.forEach((item, i) => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td>${item.category}</td>
+          <td>${item.name}</td>
+          <td>${item.brand}</td>
+          <td>${item.model}</td>
+          <td>${item.qty}</td>
+          <td>${item.location}</td>
+          <td>${item.supplier}</td>
+          <td>${item.createdAt}</td>
+          <td class="actions">
+            <button onclick="editItem(${i})">✏️</button>
+            <button onclick="deleteItem(${i})">🗑️</button>
+          </td>
+        `;
+        tableBody.appendChild(row);
+      });
+    }
+
+    function addItem(e) {
+      e.preventDefault();
+      const data = getFormData();
+      if (!data.name) return alert('Preencha o nome do item.');
+      inventory.push(data);
+      saveLocal();
+      renderTable();
+      form.reset();
+    }
+
+    function deleteItem(i) {
+      if (confirm('Excluir este item?')) {
+        inventory.splice(i, 1);
+        saveLocal();
+        renderTable();
+      }
+    }
+
+    function editItem(i) {
+      const item = inventory[i];
+      Object.keys(item).forEach(k => {
+        const el = document.getElementById(k);
+        if (el) el.value = item[k];
+      });
+      deleteItem(i);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function exportExcel() {
+      if (!inventory.length) return alert('Nenhum item para exportar.');
+
+      const ws_data = inventory.map(item => ({
+        Categoria: item.category,
+        Nome: item.name,
+        Marca: item.brand,
+        Modelo: item.model,
+        Quantidade: item.qty,
+        Local: item.location,
+        Fornecedor: item.supplier,
+        Data: item.createdAt
+      }));
+
+      // Adiciona linha de total
+      const totalQty = inventory.reduce((sum, i) => sum + i.qty, 0);
+      ws_data.push({ Categoria:'', Nome:'', Marca:'', Modelo:'Total', Quantidade:totalQty, Local:'', Fornecedor:'', Data:'' });
+
+      const ws = XLSX.utils.json_to_sheet(ws_data, { header:["Categoria","Nome","Marca","Modelo","Quantidade","Local","Fornecedor","Data"] });
+      ws['!autofilter'] = { ref: "A1:H"+(ws_data.length+1) }; // filtros automáticos
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, 'Estoque');
+      XLSX.writeFile(wb, 'estoque_profissional.xlsx');
+    }
+
+    function exportBackup() {
+      const blob = new Blob([JSON.stringify(inventory, null, 2)], { type: 'application/json' });
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = 'backup_estoque.json';
+      link.click();
+    }
+
+    function importBackup(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = evt => {
+        try {
+          const data = JSON.parse(evt.target.result);
+          if (Array.isArray(data)) {
+            inventory = data;
+            saveLocal();
+            renderTable();
+            alert('Backup importado com sucesso!');
+          }
+        } catch {
+          alert('Arquivo inválido.');
+        }
+      };
+      reader.readAsText(file);
+    }
+
+    form.addEventListener('submit', addItem);
+    renderTable();
+    window.addEventListener('beforeunload', saveLocal);
+  </script>
+</body>
+</html>
